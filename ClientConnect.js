@@ -58,19 +58,17 @@ $(document).on('knack-record-create.view_3', function(event, view, record) {
             //alert('SUCCESS! Form data saved to the Platform App as well!');
         },
         error: function(xhr, status, error) {
-            console.log('❌ Error:', error);
-            console.log('Status Code:', xhr.status);
-            console.log('Response:', xhr.responseText);
-            alert('Error: ' + xhr.status + ' - Check console for details');
+            console.log('Error:', error);
+            //console.log('Status Code:', xhr.status);
+            //console.log('Response:', xhr.responseText);
+            //alert('Error: ' + xhr.status + ' - Check console for details');
         }
     });
 });
-
 /////////////////////////////////////////////////////////////////////////////////
 /* ENTITY DETAILS - EDIT CLIENT ENTITY - SAVE TO XANO */
 /*Location: Databases/ Client Datbases / Entity Details / Edit Client Entity */
 /////////////////////////////////////////////////////////////////////////////////
-
 $(document).on('knack-record-update.view_1907', function(event, view, record) {
     const uen = String(record.field_25) || ""; 
     const companyName = String(record.field_49) || "";
@@ -90,9 +88,9 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
     const nomineeDirector = String(record.field_182) || "";
     const currentFYE = parseInt(record.field_563 || 0);
     const created_at = String(record.field_1685) || "";
-    const end_clients_uen = parseInt(record.field_25); // Works fine
+    const end_clients_name = String(record.field_49) || ""
     const formData = {
-        end_client_uen: end_clients_uen,
+        end_clients_name: end_clients_name,
         uen: uen,
         company_name: companyName,
         services_rendered: servicesRendered,
@@ -107,11 +105,8 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
         current_fye: currentFYE,
         created_at: created_at
     };
-    console.log(record.id);
-    console.log('Sending UPDATE to Xano with:', formData);
-
     $.ajax({
-        url: `https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients/1481`, 
+        url: `https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients/${end_clients_name}`, 
         type: 'PATCH',
         headers: {
             'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
@@ -119,17 +114,15 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
         },
         data: JSON.stringify(formData),
         success: function(response) {
-            console.log('✅ SUCCESS! Update sent to Xano');
-            console.log('Response:', response);
-            alert('SUCCESS! Client record updated on Platform App');
+            console.log('data Update to the Platform App');
+            //console.log('Response:', response);
+            //alert('SUCCESS! Client record updated on Platform App');
         },
         error: function(xhr, status, error) {
-            console.log('❌ Error:', error);
-            console.log('Status Code:', xhr.status);
-            console.log('Response:', xhr.responseText);
-            alert('Error: ' + xhr.status + ' - Check console for details');
+            console.log('Error:', error);
+            //console.log('Status Code:', xhr.status);
+            //console.log('Response:', xhr.responseText);
+            //alert('Error: ' + xhr.status + ' - Check console for details');
         }
     });
 });
-
-
