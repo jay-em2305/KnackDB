@@ -80,10 +80,40 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
     const workingGroup = String(record.field_1900) || "";
     const status = String(record.field_29) || "";
     const internalRefNo = String(record.field_26) || "";
-   const incorpDate = (record.field_179 && !isNaN(Date.parse(record.field_179))) 
-    ? new Date(record.field_179).toISOString() 
-    : null;
-
+    let incorpDate = null;
+    try {
+    const rawDate = record.field_179;
+    if (typeof rawDate === 'string' && rawDate.includes('/')) {
+        const [day, month, year] = rawDate.split('/');
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(parsedDate.getTime())) {
+        incorpDate = parsedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+        }
+    }
+    } catch (e) {
+    console.error("Date parse error:", e);
+    }
+        let Last_agm = null;
+    try {
+    const rawDateLGM = record.field_564;
+    if (typeof rawDateLGM === 'string' && rawDateLGM.includes('/')) {
+        const [day, month, year] = rawDateLGM.split('/');
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(parsedDate.getTime())) {
+        Last_agm = parsedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+        }
+    }
+    } catch (e) {
+    console.error("Date parse error:", e);
+    }
     const commonSealNo = String(record.field_180) || "";
     const nomineeDirector = String(record.field_182) || "";
     const currentFYE = parseInt(record.field_563 || 0);
@@ -100,6 +130,7 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
         status: status,
         internal_reference_number: internalRefNo,
         incorporation_date: incorpDate,
+        last_annual_general_meeting: Last_agm,
         common_seal_number: commonSealNo,
         nominee_director: nomineeDirector,
         current_fye: currentFYE,
