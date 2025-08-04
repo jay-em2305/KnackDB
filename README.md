@@ -89,6 +89,27 @@ This maps fields and names between Knack and Xano.
 | `field_332`, `field_333` | Phone Numbers | `phone_number` |
 | `field_1684` | Contact Display Name | `emergency_contact` |
 
+📇 Tickets Table
+| Knack Field | Field Name | Xano Field |
+| ----------- | -------------------- | --------------------------- |
+| `field_319` | Client entity | Merchant |
+| `field_292` | staff | assignedto |
+| `field_277` | BPO standing order | account_type |
+| `field_280` | creation date | created_at |
+| `field_293` | category | working_group |
+| `field_282` | request description | description |
+| `field_283` | status | status |
+| `field_285` | conclusion notes | comments |
+| `field_326`,| all transaction type | transaction type |
+| `field_327`, |
+| `field_328` |
+| `field_615`, | Docu 1-5 | attachments |
+| `field_616`, |
+| `field_617`, |
+| `field_618`, |
+| `field_619` |
+| `field_714` | BPO scores | client_satisfaction_score |
+
 📝 Notes
 Fields without a direct match (❗️) must be handled manually or added as custom fields in Xano if needed.
 Use safe() and data cleaning methods when sending from Knack to avoid empty or malformed values.

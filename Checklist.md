@@ -1,4 +1,4 @@
-👤 Client Entity
+👤 Client Table
 This maps fields and names between Knack and Xano.
 ❗️ = No equivalent in Xano (may need custom handling or ignored).
 
@@ -28,7 +28,7 @@ This maps fields and names between Knack and Xano.
 | `field_28`      | Client Group                   | ❗️ No equivalent             |
 | `field_1900`    | Working Group                  | `group`                       |
 
-📇 Contact Entity
+📇 Contact Table
 | Knack Field | Field Name | Xano Field |
 | ------------ | -------------------- | --------------------------- |
 | `field_275` | Name | `fullname` |
@@ -40,12 +40,7 @@ This maps fields and names between Knack and Xano.
 | `field_333` |
 | `field_1684` | Contact Display Name | `emergency_contact` |
 
-📝 Notes
-Fields without a direct match (❗️) must be handled manually or added as custom fields in Xano if needed.
-Use safe() and data cleaning methods when sending from Knack to avoid empty or malformed values.
-Consider consolidating unmatched fields if they serve related purposes (e.g., scanning instructions).
-
-Tickets
+📇 Tickets Table
 | Knack Field | Field Name | Xano Field |
 | ----------- | -------------------- | --------------------------- |
 | `field_319` | Client entity | Merchant |
@@ -65,3 +60,8 @@ Tickets
 | `field_618`, |
 | `field_619` |
 | `field_714` | BPO scores | client_satisfaction_score |
+
+📝 Notes
+Fields without a direct match (❗️) must be handled manually or added as custom fields in Xano if needed.
+Use safe() and data cleaning methods when sending from Knack to avoid empty or malformed values.
+Consider consolidating unmatched fields if they serve related purposes (e.g., scanning instructions).
