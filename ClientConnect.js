@@ -157,3 +157,85 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
         }
     });
 });
+
+/////////////////////////////////////////////////////////////////////////////////
+/* MANAGEMENT PANEL - EDIT CLIENT DATABASE INFORMATION - SAVE TO XANO */
+/*Location: Management Pane/ Secretarial / Edit Client Database*/
+/////////////////////////////////////////////////////////////////////////////////
+//Store row data when clicking a cell
+var lastClickedRowData = {};
+
+$(document).on('knack-view-render.any', function () {
+  $('.kn-table td.cell-edit').off('mousedown').on('mousedown', function () {
+    const $row = $(this).closest('tr');
+    const rowData = {};
+
+    $row.find('td').each(function () {
+      const key = $(this).data('field-key');
+      const value = $(this).text().trim();
+      if (key) rowData[key] = value;
+    });
+
+    lastClickedRowData = rowData;
+    console.log('✔️ Stored row data:', lastClickedRowData);
+  });
+});
+
+// Real-time inline modal capture + fallback
+$(document).on('click', '.drop .submit .kn-button.save', function (e) {
+  e.preventDefault();
+
+  // Real-time values from modal
+  const getFieldValue = (fieldId) => $(`#cell-editor-form #${fieldId}`).val()?.trim() || lastClickedRowData[fieldId] || "";
+  
+  const end_clients_name = (lastClickedRowData["field_49"] || "").trim();
+  const end_clients_uen = (lastClickedRowData["field_25"] || "").trim();
+  if (!end_clients_uen || !end_clients_name) {
+    console.warn("UEN or Company Name missing.");
+    return;
+  }
+
+  const payload = {
+    end_clients_name,
+    end_clients_uen: end_clients_uen,
+    uen:getFieldValue("field_25"),
+    company_name: getFieldValue("field_49"),
+    fomerly_known_as: getFieldValue("field_525"),
+    financial_year_end: getFieldValue("field_178"),
+    group: getFieldValue("field_1900"),
+    status: getFieldValue("field_29"),
+    internal_reference_number: getFieldValue("field_26"),
+    incorporation_date: getFieldValue("field_179"),
+    last_annual_general_meeting: getFieldValue("field_564"),
+    common_seal_number: getFieldValue("field_180"),
+    nominee_director: getFieldValue("field_182"),
+    current_fye: parseInt(getFieldValue("field_563") || "0"),
+    created_at: getFieldValue("field_1685"),
+    services_rendered: getFieldValue("field_183"),
+    updated_value: getFieldValue("field_49"), // real-time value
+    clicked_row_data: lastClickedRowData
+  };
+
+  const fullUrl = `https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients/${encodeURIComponent(end_clients_name)}/${encodeURIComponent(end_clients_uen)}`;
+  $.ajax({
+    url: fullUrl,
+    type: 'PATCH',
+    headers: {
+        'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+        'Content-Type': 'application/json'
+    },
+    data: JSON.stringify(payload),
+    success: function (response) {
+       console.log('data Update to the Platform App');
+    },
+    error: function (xhr, status, error) {
+      console.error('Update failed:', error);
+      try {
+        const parsed = JSON.parse(xhr.responseText);
+        console.log('Error:', parsed);
+      } catch {
+        console.log('Raw response:', xhr.responseText);
+      }
+    }
+  });
+});
