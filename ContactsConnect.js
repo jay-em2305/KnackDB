@@ -193,13 +193,13 @@ $(document).on('knack-record-create.view_1784', function(event, view, record) {
         success: function(response) {
             console.log('data saved to the Platform App');
             //console.log('Response:', response);
-            alert('SUCCESS! Form data saved to the Platform App as well!');
+            //alert('SUCCESS! Form data saved to the Platform App as well!');
         },
         error: function(xhr, status, error) {
             console.log(' Error:', error);
             //console.log('Status Code:', xhr.status);
             console.log('Response:', xhr.responseText);
-            alert('Error: ' + xhr.status + ' - Check console for details');
+            //alert('Error: ' + xhr.status + ' - Check console for details');
         }
     });
 });
