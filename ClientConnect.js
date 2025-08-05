@@ -244,14 +244,20 @@ $(document).on('click', '.drop .submit .kn-button.save', function (e) {
     } catch (e) {
     console.error("Date parse error:", e);
     }
-  const last_updated_at = new Date().toISOString(); 
+        const last_updated_at = new Date().toISOString(); 
+    let FYE = null;
+  if(getFieldValueSelect("field_178") == "Other FYE"){
+    FYE = getFieldValue("field_559");
+  }else{
+    FYE = getFieldValueSelect("field_178");
+  }
   const payload = {
     end_clients_name,
     end_clients_uen: end_clients_uen,
     uen:getFieldValue("field_25"),
     company_name: getFieldValue("field_49"),
     fomerly_known_as: getFieldValue("field_525"),
-    financial_year_end: getFieldValueSelect("field_178"),
+    financial_year_end: FYE,
     group: getFieldValueSelect("field_1900"),
     status: getFieldValue("field_29"),
     internal_reference_number: getFieldValue("field_26"),
