@@ -162,7 +162,8 @@ $(document).on('knack-record-update.view_1907', function(event, view, record) {
 /* MANAGEMENT PANEL - EDIT CLIENT DATABASE INFORMATION - SAVE TO XANO */
 /*Location: Management Pane/ Secretarial / Edit Client Database*/
 /////////////////////////////////////////////////////////////////////////////////
-//Store row data when clicking a cell
+// GLOBAL variable to store row data
+// Store row data when clicking a cell
 var lastClickedRowData = {};
 
 $(document).on('knack-view-render.any', function () {
@@ -177,7 +178,7 @@ $(document).on('knack-view-render.any', function () {
     });
 
     lastClickedRowData = rowData;
-    console.log('✔️ Stored row data:', lastClickedRowData);
+    //console.log('Stored row data:', lastClickedRowData);
   });
 });
 
@@ -188,64 +189,152 @@ $(document).on('click', '.drop .submit .kn-button.save', function (e) {
   // Real-time values from modal
   const getFieldValue = (fieldId) => $(`#cell-editor-form #${fieldId}`).val()?.trim() || lastClickedRowData[fieldId] || "";
   
-  const end_clients_name = (lastClickedRowData["field_49"] || "").trim();
-  const end_clients_uen = (lastClickedRowData["field_25"] || "").trim();
-  if (!end_clients_uen || !end_clients_name) {
-    console.warn("UEN or Company Name missing.");
-    return;
+    const getFieldValueSelect = (fieldId) => {
+  // Prefer real-time modal field
+  const $field = $(`#cell-editor-form [name="${fieldId}"]`);
+  if ($field.length) {
+    if ($field.is('select')) {
+      return $field.find('option:selected').val()?.trim() || "";
+    }
+    return $field.val()?.trim() || "";
   }
+  // Fallback to lastClickedRowData
+  return lastClickedRowData[fieldId] || "";
+};
+  let  end_clients_name = (lastClickedRowData["field_49"] || "").trim();
+  let  end_clients_uen = (lastClickedRowData["field_25"] || "").trim(); 
+  if ( !end_clients_name) {
+   end_clients_name = "No Value";
+  }
+    if (!end_clients_uen) {
+    end_clients_uen = 123+"NoValue";
 
+  }
+ let incorpDate = null;
+    try {
+    const rawDate = getFieldValue("field_179");
+    if (typeof rawDate === 'string' && rawDate.includes('/')) {
+        const [day, month, year] = rawDate.split('/');
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(parsedDate.getTime())) {
+        incorpDate = parsedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+        }
+    }
+    } catch (e) {
+    console.error("Date parse error:", e);
+    }
+    let Last_agm = null;
+    try {
+    const rawDateLGM = getFieldValue("field_564");
+    if (typeof rawDateLGM === 'string' && rawDateLGM.includes('/')) {
+        const [day, month, year] = rawDateLGM.split('/');
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(parsedDate.getTime())) {
+        Last_agm = parsedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+        }
+    }
+    } catch (e) {
+    console.error("Date parse error:", e);
+    }
+  const last_updated_at = new Date().toISOString(); 
   const payload = {
     end_clients_name,
     end_clients_uen: end_clients_uen,
     uen:getFieldValue("field_25"),
     company_name: getFieldValue("field_49"),
     fomerly_known_as: getFieldValue("field_525"),
-    financial_year_end: getFieldValue("field_178"),
-    group: getFieldValue("field_1900"),
+    financial_year_end: getFieldValueSelect("field_178"),
+    group: getFieldValueSelect("field_1900"),
     status: getFieldValue("field_29"),
     internal_reference_number: getFieldValue("field_26"),
-    incorporation_date: getFieldValue("field_179"),
-    last_annual_general_meeting: getFieldValue("field_564"),
+    incorporation_date: incorpDate,
+    last_annual_general_meeting: Last_agm,
     common_seal_number: getFieldValue("field_180"),
     nominee_director: getFieldValue("field_182"),
     current_fye: parseInt(getFieldValue("field_563") || "0"),
     created_at: getFieldValue("field_1685"),
     services_rendered: getFieldValue("field_183"),
     updated_value: getFieldValue("field_49"), // real-time value
+    last_updated_at: last_updated_at,
     clicked_row_data: lastClickedRowData
   };
 
   const fullUrl = `https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients/${encodeURIComponent(end_clients_name)}/${encodeURIComponent(end_clients_uen)}`;
+
+  //console.log("📤 Sending to Xano:", fullUrl);
+  //console.log("🧾 Payload:", payload);
+
   $.ajax({
     url: fullUrl,
     type: 'PATCH',
     headers: {
-        'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
-        'Content-Type': 'application/json'
+            'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+            'Content-Type': 'application/json'
     },
     data: JSON.stringify(payload),
     success: function (response) {
-       console.log('data Update to the Platform App');
+      console.log('Data successfully patched to Xano:', response);
     },
     error: function (xhr, status, error) {
-      console.error('Update failed:', error);
+      console.error('Xano update failed:', error);
       try {
         const parsed = JSON.parse(xhr.responseText);
-        console.log('Error:', parsed);
+        console.log('Xano Error:', parsed);
       } catch {
         console.log('Raw response:', xhr.responseText);
       }
     }
   });
 });
-
 /////////////////////////////////////////////////////////////////////////////////
 /* SEC PANEL - ADD NEW CLIENT - SAVE TO XANO */
 /*Location: Work Panel/ SEC Panel / Ticket / Add New Client */
 /////////////////////////////////////////////////////////////////////////////////
-
 $(document).on('knack-record-create.view_280', function(event, view, record) {
+    const safe = value => (value && value.trim() !== "" ? value : null);
+    const companyName = String(record.field_49 || "");
+    const status = String(record.field_29 || "");
+    const formData = {
+        company_name: safe(companyName),
+        status: safe(status),
+    };
+
+    console.log('Sending real data:', formData);
+
+    $.ajax({
+        url: 'https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients',
+        type: 'POST',
+        headers: {
+            'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(formData),
+        success: function(response) {
+            console.log('data saved to the Platform App');
+            //console.log('Response:', response);
+            //alert('SUCCESS! Form data saved to the Platform App as well!');
+        },
+        error: function(xhr, status, error) {
+            console.log('Error:', error);
+            //console.log('Status Code:', xhr.status);
+            //console.log('Response:', xhr.responseText);
+            //alert('Error: ' + xhr.status + ' - Check console for details');
+        }
+    });
+});
+/////////////////////////////////////////////////////////////////////////////////
+/* HR PANEL - ADD NEW CLIENT - SAVE TO XANO */
+/*Location: Work Panel/ HR Panel / Payroll & Recruit / Add New Client */
+/////////////////////////////////////////////////////////////////////////////////
+$(document).on('knack-record-create.view_1783', function(event, view, record) {
     const safe = value => (value && value.trim() !== "" ? value : null);
     const companyName = String(record.field_49 || "");
     const status = String(record.field_29 || "");
