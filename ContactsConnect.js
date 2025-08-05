@@ -1,4 +1,108 @@
 /////////////////////////////////////////////////////////////////////////////////
+/* RO PANEL - ADD RO CONTACTS  - SAVE TO XANO */
+/*Location: RO Panel/ Add Contact */
+/////////////////////////////////////////////////////////////////////////////////
+$(document).on('knack-record-create.view_699', function(event, view, record) {
+    const safe = value => (value && value.trim() !== "" ? value : null);
+    const name = String(record.field_275 || "");
+    const type = String(record.field_338 || "");
+    const rawPhone332 = record.field_332;
+    const rawPhone333 = record.field_333;
+    const cleanPhone332 = rawPhone332?.replace(/<[^>]+>/g, '').trim();
+    const cleanPhone333 = rawPhone333?.replace(/<[^>]+>/g, '').trim();
+    const phone_number = [cleanPhone332, cleanPhone333].filter(Boolean);
+    const rawEmail = record.field_330; 
+    const extractedEmail = rawEmail?.match(/mailto:([^"]+)/)?.[1] || 
+                        rawEmail?.replace(/<[^>]+>/g, '').trim() || null;
+    const emailArray = extractedEmail ? [extractedEmail] : [];
+    const last_updated_at = new Date().toISOString();
+  const contact_display = JSON.stringify([{
+  name: safe(name) || "",
+  email: safe(extractedEmail) || "",
+  contact_number: phone_number.join(", ")
+}]);
+    const formData = {
+        fullname: safe(name),
+        type: safe(type),
+        phone_number: phone_number,
+        email: emailArray,
+        last_updated_at:last_updated_at,
+        emergency_contact: contact_display
+    };
+    $.ajax({
+        url: 'https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/contacts',
+        type: 'POST',
+        headers: {
+             'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(formData),
+        success: function(response) {
+            console.log('data saved to the Platform App');
+            //console.log('Response:', response);
+            alert('SUCCESS! Form data saved to the Platform App as well!');
+        },
+        error: function(xhr, status, error) {
+            console.log(' Error:', error);
+            //console.log('Status Code:', xhr.status);
+            console.log('Response:', xhr.responseText);
+            alert('Error: ' + xhr.status + ' - Check console for details');
+        }
+    });
+});
+/////////////////////////////////////////////////////////////////////////////////
+/* BPO PANEL - ADD BPO CONTACTS  - SAVE TO XANO */
+/*Location: BPO Panel/ Add Contact */
+/////////////////////////////////////////////////////////////////////////////////
+$(document).on('knack-record-create.view_1070', function(event, view, record) {
+    const safe = value => (value && value.trim() !== "" ? value : null);
+    const name = String(record.field_275 || "");
+    const type = String(record.field_338 || "");
+    const rawPhone332 = record.field_332;
+    const rawPhone333 = record.field_333;
+    const cleanPhone332 = rawPhone332?.replace(/<[^>]+>/g, '').trim();
+    const cleanPhone333 = rawPhone333?.replace(/<[^>]+>/g, '').trim();
+    const phone_number = [cleanPhone332, cleanPhone333].filter(Boolean);
+    const rawEmail = record.field_330; 
+    const extractedEmail = rawEmail?.match(/mailto:([^"]+)/)?.[1] || 
+                        rawEmail?.replace(/<[^>]+>/g, '').trim() || null;
+    const emailArray = extractedEmail ? [extractedEmail] : [];
+    const last_updated_at = new Date().toISOString();
+  const contact_display = JSON.stringify([{
+  name: safe(name) || "",
+  email: safe(extractedEmail) || "",
+  contact_number: phone_number.join(", ")
+}]);
+    const formData = {
+        fullname: safe(name),
+        type: safe(type),
+        phone_number: phone_number,
+        email: emailArray,
+        last_updated_at:last_updated_at,
+        emergency_contact: contact_display
+    };
+    $.ajax({
+        url: 'https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/contacts',
+        type: 'POST',
+        headers: {
+             'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(formData),
+        success: function(response) {
+            console.log('data saved to the Platform App');
+            //console.log('Response:', response);
+            alert('SUCCESS! Form data saved to the Platform App as well!');
+        },
+        error: function(xhr, status, error) {
+            console.log(' Error:', error);
+            //console.log('Status Code:', xhr.status);
+            console.log('Response:', xhr.responseText);
+            //alert('Error: ' + xhr.status + ' - Check console for details');
+        }
+    });
+});
+/////////////////////////////////////////////////////////////////////////////////
 /* SEc PANEL - ADD CONTACTS CLIENT - SAVE TO XANO */
 /*Location: Sec Panel/ Tickets / Add Contact */
 /////////////////////////////////////////////////////////////////////////////////

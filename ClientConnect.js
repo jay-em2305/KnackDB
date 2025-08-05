@@ -372,3 +372,37 @@ $(document).on('knack-record-create.view_1783', function(event, view, record) {
         }
     });
 });
+/////////////////////////////////////////////////////////////////////////////////
+/* BPO PANEL - ADD BPO NEW CLIENT - SAVE TO XANO */
+/*Location: Work Panel/ BPO Panel / Add New Client */
+/////////////////////////////////////////////////////////////////////////////////
+$(document).on('knack-record-create.view_1783', function(event, view, record) {
+    const safe = value => (value && value.trim() !== "" ? value : null);
+    const companyName = String(record.field_49 || "");
+    const formData = {
+        company_name: safe(companyName)
+    };
+
+    console.log('Sending real data:', formData);
+
+    $.ajax({
+        url: 'https://xpjg-p6rt-dhkq.s2.xano.io/api:silPPn_p/end_clients',
+        type: 'POST',
+        headers: {
+            'Authorization': 'Bearer {{XANO-KNACK ACCESSTOKEN}}',
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(formData),
+        success: function(response) {
+            console.log('data saved to the Platform App');
+            //console.log('Response:', response);
+            //alert('SUCCESS! Form data saved to the Platform App as well!');
+        },
+        error: function(xhr, status, error) {
+            console.log('Error:', error);
+            //console.log('Status Code:', xhr.status);
+            //console.log('Response:', xhr.responseText);
+            //alert('Error: ' + xhr.status + ' - Check console for details');
+        }
+    });
+});
